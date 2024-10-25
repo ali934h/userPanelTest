@@ -9,7 +9,7 @@ function App() {
   useEffect(() => {
     if (window.turnstile) {
       window.turnstile.render(captchaRef.current, {
-        sitekey: "YOUR_SITE_KEY",
+        sitekey: "0x4AAAAAAAycagpkswjtvzkW",
         callback: (token) => setCaptchaToken(token),
       });
     }
