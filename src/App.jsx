@@ -1,59 +1,67 @@
-import React, { useState } from "react";
-import Turnstile from "@cloudflare/turnstile-react";
+import React, { useState, useEffect, useRef } from "react";
 
 function App() {
   const [email, setEmail] = useState("");
-  const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
   const [message, setMessage] = useState("");
+  const captchaRef = useRef(null);
 
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
-  };
+  useEffect(() => {
+    if (window.turnstile) {
+      window.turnstile.render(captchaRef.current, {
+        sitekey: "YOUR_SITE_KEY",
+        callback: (token) => setCaptchaToken(token),
+      });
+    }
+  }, []);
 
-  const handleToken = (token) => {
-    setToken(token);
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!token) {
-      setMessage("لطفا کپچا را حل کنید.");
+    if (!captchaToken) {
+      setMessage("لطفاً کپچا را حل کنید.");
       return;
     }
-
-    setLoading(true);
-    setMessage("");
 
     try {
       const response = await fetch("/api/submit-email", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, token }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, captchaToken }),
       });
+
       if (response.ok) {
-        setMessage("ایمیل با موفقیت ارسال شد.");
+        setMessage("ایمیل با موفقیت ارسال شد!");
+        setEmail(""); // پاک کردن فیلد ایمیل پس از موفقیت
+        setCaptchaToken(""); // پاک کردن توکن کپچا
       } else {
-        setMessage("خطایی رخ داده است.");
+        setMessage("خطایی در ارسال ایمیل رخ داد.");
       }
     } catch (error) {
-      setMessage("خطایی رخ داده است.");
-    } finally {
-      setLoading(false);
+      setMessage("ارتباط با سرور برقرار نشد.");
     }
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>فرم ایمیل با کپچا کلودفلر</h1>
-      <form onSubmit={handleSubmit} style={{ maxWidth: "400px", margin: "0 auto" }}>
-        <input type="email" placeholder="ایمیل خود را وارد کنید" value={email} onChange={handleEmailChange} required style={{ padding: "10px", width: "100%", marginBottom: "10px" }} />
-        <Turnstile sitekey="YOUR_SITE_KEY" onVerify={handleToken} theme="light" />
-        <button type="submit" disabled={loading} style={{ padding: "10px", width: "100%", marginTop: "10px" }}>
-          {loading ? "در حال ارسال..." : "ارسال"}
+    <div style={{ maxWidth: "300px", margin: "50px auto", textAlign: "center" }}>
+      <h2>فرم ارسال ایمیل</h2>
+      <form onSubmit={handleSubmit}>
+        <label>
+          ایمیل:
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: "100%", padding: "8px", margin: "10px 0" }} />
+        </label>
+
+        {/* کپچای کلودفلر */}
+        <div ref={captchaRef} style={{ margin: "10px 0" }}></div>
+
+        <button type="submit" style={{ padding: "8px 16px", cursor: "pointer", marginTop: "10px" }}>
+          ارسال
         </button>
-        {message && <p>{message}</p>}
       </form>
+      {message && <p>{message}</p>}
     </div>
   );
 }
