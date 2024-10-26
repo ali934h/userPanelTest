@@ -25,7 +25,7 @@ function App() {
     }
 
     try {
-      const response = await fetch("/api/submit-email", {
+      const response = await fetch("https://userpanelworker.kenconsidine90.workers.dev/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,12 +33,13 @@ function App() {
         body: JSON.stringify({ email, captchaToken }),
       });
 
-      if (response.ok) {
+      const data = await response.json();
+      if (data.success) {
         setMessage("ایمیل با موفقیت ارسال شد!");
-        setEmail(""); // پاک کردن فیلد ایمیل پس از موفقیت
+        setEmail(""); // پاک کردن فیلد ایمیل
         setCaptchaToken(""); // پاک کردن توکن کپچا
       } else {
-        setMessage("خطایی در ارسال ایمیل رخ داد.");
+        setMessage(data.message || "خطایی در ارسال ایمیل رخ داد.");
       }
     } catch (error) {
       setMessage("ارتباط با سرور برقرار نشد.");
