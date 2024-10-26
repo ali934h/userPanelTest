@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 
 function App() {
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState(""); // نام کامل
-  const [phoneNumber, setPhoneNumber] = useState(""); // شماره موبایل
-  const [message, setMessage] = useState(""); // پیام
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [userMessage, setUserMessage] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
+  const [message, setMessage] = useState("");
   const captchaRef = useRef(null);
 
   useEffect(() => {
@@ -36,17 +37,16 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, fullName, phoneNumber, message, captchaToken }),
+        body: JSON.stringify({ email, fullName, phoneNumber, userMessage, captchaToken }),
       });
 
       const data = await response.json();
       if (data.success) {
         setMessage("اطلاعات با موفقیت ارسال شد!");
-        // پاک کردن فیلدها
         setEmail("");
         setFullName("");
         setPhoneNumber("");
-        setMessage(""); // پاک کردن فیلد پیام
+        setUserMessage("");
         setCaptchaToken("");
       } else {
         setMessage(data.message || "خطایی در ارسال اطلاعات رخ داد.");
@@ -57,24 +57,27 @@ function App() {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}>
+    <div style={{ maxWidth: "300px", margin: "50px auto", textAlign: "center" }}>
       <h2>فرم ارسال اطلاعات</h2>
       <form onSubmit={handleSubmit}>
         <label>
           نام کامل:
           <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required style={{ width: "100%", padding: "8px", margin: "10px 0" }} />
         </label>
+
         <label>
           ایمیل:
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: "100%", padding: "8px", margin: "10px 0" }} />
         </label>
+
         <label>
           شماره موبایل:
           <input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required style={{ width: "100%", padding: "8px", margin: "10px 0" }} />
         </label>
+
         <label>
-          پیام:
-          <textarea value={message} onChange={(e) => setMessage(e.target.value)} required style={{ width: "100%", padding: "8px", margin: "10px 0", resize: "none" }} />
+          پیام شما:
+          <textarea value={userMessage} onChange={(e) => setUserMessage(e.target.value)} required style={{ width: "100%", padding: "8px", margin: "10px 0" }} />
         </label>
 
         {/* کپچای کلودفلر */}
