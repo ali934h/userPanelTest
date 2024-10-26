@@ -19,7 +19,16 @@ function App() {
       }
     };
 
-    loadCaptcha();
+    if (!window.turnstile) {
+      const interval = setInterval(() => {
+        if (window.turnstile) {
+          loadCaptcha();
+          clearInterval(interval);
+        }
+      }, 500); // چک کردن هر نیم ثانیه تا زمانی که turnstile موجود باشد
+    } else {
+      loadCaptcha();
+    }
   }, []);
 
   const handleSubmit = async (e) => {
