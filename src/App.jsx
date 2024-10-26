@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 
 function App() {
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState(""); // نام کامل
+  const [phoneNumber, setPhoneNumber] = useState(""); // شماره موبایل
+  const [message, setMessage] = useState(""); // پیام
   const [captchaToken, setCaptchaToken] = useState("");
-  const [message, setMessage] = useState("");
   const captchaRef = useRef(null);
 
   useEffect(() => {
@@ -34,16 +36,20 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, captchaToken }),
+        body: JSON.stringify({ email, fullName, phoneNumber, message, captchaToken }),
       });
 
       const data = await response.json();
       if (data.success) {
-        setMessage("ایمیل با موفقیت ارسال شد!");
-        setEmail(""); // پاک کردن فیلد ایمیل
-        setCaptchaToken(""); // پاک کردن توکن کپچا
+        setMessage("اطلاعات با موفقیت ارسال شد!");
+        // پاک کردن فیلدها
+        setEmail("");
+        setFullName("");
+        setPhoneNumber("");
+        setMessage(""); // پاک کردن فیلد پیام
+        setCaptchaToken("");
       } else {
-        setMessage(data.message || "خطایی در ارسال ایمیل رخ داد.");
+        setMessage(data.message || "خطایی در ارسال اطلاعات رخ داد.");
       }
     } catch (error) {
       setMessage("ارتباط با سرور برقرار نشد.");
@@ -51,12 +57,24 @@ function App() {
   };
 
   return (
-    <div style={{ maxWidth: "300px", margin: "50px auto", textAlign: "center" }}>
-      <h2>فرم ارسال ایمیل</h2>
+    <div style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}>
+      <h2>فرم ارسال اطلاعات</h2>
       <form onSubmit={handleSubmit}>
+        <label>
+          نام کامل:
+          <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required style={{ width: "100%", padding: "8px", margin: "10px 0" }} />
+        </label>
         <label>
           ایمیل:
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: "100%", padding: "8px", margin: "10px 0" }} />
+        </label>
+        <label>
+          شماره موبایل:
+          <input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required style={{ width: "100%", padding: "8px", margin: "10px 0" }} />
+        </label>
+        <label>
+          پیام:
+          <textarea value={message} onChange={(e) => setMessage(e.target.value)} required style={{ width: "100%", padding: "8px", margin: "10px 0", resize: "none" }} />
         </label>
 
         {/* کپچای کلودفلر */}
