@@ -7,12 +7,16 @@ function App() {
   const captchaRef = useRef(null);
 
   useEffect(() => {
-    if (window.turnstile) {
-      window.turnstile.render(captchaRef.current, {
-        sitekey: "0x4AAAAAAAycagpkswjtvzkW",
-        callback: (token) => setCaptchaToken(token),
-      });
-    }
+    const loadCaptcha = () => {
+      if (window.turnstile) {
+        window.turnstile.render(captchaRef.current, {
+          sitekey: "0x4AAAAAAAycagpkswjtvzkW",
+          callback: (token) => setCaptchaToken(token),
+        });
+      }
+    };
+
+    loadCaptcha();
   }, []);
 
   const handleSubmit = async (e) => {
