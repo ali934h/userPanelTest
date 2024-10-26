@@ -9,26 +9,17 @@ function App() {
   const [message, setMessage] = useState("");
   const captchaRef = useRef(null);
 
-  useEffect(() => {
-    const loadCaptcha = () => {
-      if (window.turnstile) {
-        window.turnstile.render(captchaRef.current, {
-          sitekey: "0x4AAAAAAAycagpkswjtvzkW",
-          callback: (token) => setCaptchaToken(token),
-        });
-      }
-    };
-
-    if (!window.turnstile) {
-      const interval = setInterval(() => {
-        if (window.turnstile) {
-          loadCaptcha();
-          clearInterval(interval);
-        }
-      }, 500); // چک کردن هر نیم ثانیه تا زمانی که turnstile موجود باشد
-    } else {
-      loadCaptcha();
+  const loadCaptcha = () => {
+    if (window.turnstile) {
+      window.turnstile.render(captchaRef.current, {
+        sitekey: "0x4AAAAAAAycagpkswjtvzkW",
+        callback: (token) => setCaptchaToken(token),
+      });
     }
+  };
+
+  useEffect(() => {
+    loadCaptcha();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -56,13 +47,16 @@ function App() {
         setFullName("");
         setPhoneNumber("");
         setUserMessage("");
-        setCaptchaToken("");
       } else {
         setMessage(data.message || "خطایی در ارسال اطلاعات رخ داد.");
       }
     } catch (error) {
       setMessage("ارتباط با سرور برقرار نشد.");
     }
+
+    // ریست کردن کپچا
+    setCaptchaToken(""); // توکن کپچا را ریست می‌کنیم
+    loadCaptcha(); // کپچا را دوباره لود می‌کنیم
   };
 
   return (
