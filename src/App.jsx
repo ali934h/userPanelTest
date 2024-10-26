@@ -10,6 +10,11 @@ function App() {
   const captchaRef = useRef(null);
 
   const loadCaptcha = () => {
+    if (captchaRef.current) {
+      // حذف محتوای قبلی باکس کپچا
+      captchaRef.current.innerHTML = "";
+    }
+
     if (window.turnstile) {
       window.turnstile.render(captchaRef.current, {
         sitekey: "0x4AAAAAAAycagpkswjtvzkW",
